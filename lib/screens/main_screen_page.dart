@@ -10,16 +10,19 @@ import 'package:flutter_book_tracker_app/widgets/book_details_dialog.dart';
 import 'package:flutter_book_tracker_app/widgets/book_search_page.dart';
 import 'package:flutter_book_tracker_app/widgets/create_profile.dart';
 import 'package:flutter_book_tracker_app/widgets/reading_list_card.dart';
+import 'package:provider/provider.dart';
 
 class MainScreenPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    CollectionReference usersCollection =
+    CollectionReference userCollectionReference =
         FirebaseFirestore.instance.collection('users');
     CollectionReference bookCollectionReference =
         FirebaseFirestore.instance.collection('books');
     List<Book> userBooksReadList = [];
     // int booksRead = 0;
+
+    var authUser = Provider.of<User?>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -38,7 +41,7 @@ class MainScreenPage extends StatelessWidget {
         ),
         actions: [
           StreamBuilder<QuerySnapshot>(
-            stream: usersCollection.snapshots(),
+            stream: userCollectionReference.snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Center(
@@ -48,8 +51,9 @@ class MainScreenPage extends StatelessWidget {
               final userListStream = snapshot.data!.docs.map((user) {
                 return MUser.fromDocument(user);
               }).where((user) {
-                return (user.uid == FirebaseAuth.instance.currentUser!.uid);
+                return (user.uid == authUser!.uid);
               }).toList();
+
               MUser curUser = userListStream[0];
 
               return Column(
@@ -158,8 +162,7 @@ class MainScreenPage extends StatelessWidget {
                   snapshot.data!.docs.map((book) {
                 return Book.fromDocument(book);
               }).where((book) {
-                return ((book.userId ==
-                        FirebaseAuth.instance.currentUser!.uid)) &&
+                return ((book.userId == authUser!.uid)) &&
                     (book.finishedReading == null) &&
                     (book.startedReading != null);
               }).toList();
@@ -167,8 +170,7 @@ class MainScreenPage extends StatelessWidget {
               userBooksReadList = snapshot.data!.docs.map((book) {
                 return Book.fromDocument(book);
               }).where((book) {
-                return ((book.userId ==
-                        FirebaseAuth.instance.currentUser!.uid)) &&
+                return ((book.userId == authUser!.uid)) &&
                     (book.finishedReading != null) &&
                     (book.startedReading != null);
               }).toList();
@@ -257,8 +259,7 @@ class MainScreenPage extends StatelessWidget {
                 return Book.fromDocument(book);
                 // ログイン中ユーザのuidでbookをフィルタリングする
               }).where((book) {
-                return ((book.userId ==
-                        FirebaseAuth.instance.currentUser!.uid)) &&
+                return ((book.userId == authUser!.uid)) &&
                     (book.startedReading == null) &&
                     (book.finishedReading == null);
               }).toList();

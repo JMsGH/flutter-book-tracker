@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_book_tracker_app/screens/login_screen.dart';
 import 'package:flutter_book_tracker_app/screens/main_screen_page.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,16 +24,24 @@ class MyApp extends StatelessWidget {
       widget = LoginPage();
     }
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'BookTracker',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        textTheme: GoogleFonts.notoSansTextTheme(
-          Theme.of(context).textTheme,
+    return MultiProvider(
+      providers: [
+        StreamProvider<User?>(
+          initialData: null,
+          create: (context) => FirebaseAuth.instance.authStateChanges(),
+        )
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'BookTracker',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          textTheme: GoogleFonts.notoSansTextTheme(
+            Theme.of(context).textTheme,
+          ),
         ),
+        home: widget,
       ),
-      home: widget,
     );
   }
 }
