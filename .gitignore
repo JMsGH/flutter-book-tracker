@@ -1,4 +1,9 @@
 index.html
+config.dart
+AppDelegate.swift
+AndroidManifest.xml
+key.properties
+
 # Miscellaneous
 *.class
 *.log

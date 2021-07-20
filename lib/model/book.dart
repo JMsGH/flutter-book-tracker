@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_book_tracker_app/constants/constants.dart';
 
 class Book {
   final String? id;
@@ -57,7 +58,7 @@ class Book {
       photoUrl: data.get('photo_url'),
       pageCount: data.get('page_count'),
       publishedDate: data.get('published_date'),
-      rating: data.get('rating'),
+      rating: parseDouble(data.get('rating')),
       startedReading: data.get('started_reading_at'),
       finishedReading: data.get('finished_reading_at'),
       userId: data.get('user_id'),
@@ -72,7 +73,7 @@ class Book {
       'notes': notes,
       'photo_url': photoUrl,
       'published_date': publishedDate,
-      'rating': rating,
+      'rating': rating != null ? rating!.toDouble() : 0.0,
       'description': description,
       'page_count': pageCount,
       'started_reading_at': startedReading,

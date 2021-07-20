@@ -24,6 +24,14 @@ class MainScreenPage extends StatelessWidget {
 
     var authUser = Provider.of<User?>(context);
 
+    // if (authUser != null) {
+    //   Navigator.push(
+    //       context,
+    //       MaterialPageRoute(
+    //         builder: (context) => LoginPage(),
+    //       ));
+    // }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white24,
@@ -32,6 +40,10 @@ class MainScreenPage extends StatelessWidget {
         centerTitle: false,
         title: Row(
           children: [
+            Image.asset(
+              'assets/images/Icon-76.png',
+              scale: 2,
+            ),
             Text(
               'A.Reader',
               style: Theme.of(context).textTheme.headline6!.copyWith(
@@ -48,6 +60,14 @@ class MainScreenPage extends StatelessWidget {
                   child: CircularProgressIndicator(),
                 );
               }
+              // if (authUser == null) {
+              //   // return Text('予期せぬエラー');
+              //   Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => LoginPage(),
+              //       ));
+              // }
               final userListStream = snapshot.data!.docs.map((user) {
                 return MUser.fromDocument(user);
               }).where((user) {
@@ -58,10 +78,19 @@ class MainScreenPage extends StatelessWidget {
 
               return Column(
                 children: [
-                  InkWell(
-                    child: SizedBox(
-                      height: 40,
-                      width: 40,
+                  SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: InkWell(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return createProfileDialog(
+                                context, curUser, userBooksReadList);
+                          },
+                        );
+                      },
                       child: CircleAvatar(
                         radius: 60,
                         backgroundImage: NetworkImage(curUser.avatarUrl ??
@@ -70,15 +99,6 @@ class MainScreenPage extends StatelessWidget {
                         child: Text(''),
                       ),
                     ),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return createProfileDialog(
-                              context, curUser, userBooksReadList);
-                        },
-                      );
-                    },
                   ),
                   Text(
                     curUser.displayName.toUpperCase(),
@@ -157,6 +177,14 @@ class MainScreenPage extends StatelessWidget {
                 return Text('表示する書籍データがありません',
                     style: Theme.of(context).textTheme.headline4);
               }
+              // if (authUser == null) {
+              //   // return Text('予期せぬエラー');
+              //   Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => LoginPage(),
+              //       ));
+              // }
 
               final userBookFilteredReadListStream =
                   snapshot.data!.docs.map((book) {
@@ -179,6 +207,7 @@ class MainScreenPage extends StatelessWidget {
                   flex: 1,
                   child: (userBookFilteredReadListStream.length > 0)
                       ? ListView.builder(
+                          physics: BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
                           itemCount: userBookFilteredReadListStream.length,
                           itemBuilder: (context, index) {
@@ -190,7 +219,7 @@ class MainScreenPage extends StatelessWidget {
                                 image: book.photoUrl!,
                                 title: book.title,
                                 author: book.author!,
-                                rating: (book.rating) != null ? book.rating : 0,
+                                rating: book.rating!,
                               ),
                               onTap: () {
                                 showDialog(
@@ -254,6 +283,14 @@ class MainScreenPage extends StatelessWidget {
                       style: Theme.of(context).textTheme.headline4),
                 );
               }
+              // if (authUser == null) {
+              //   // return Text('予期せぬエラー');
+              //   Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => LoginPage(),
+              //       ));
+              // }
 
               final readingListListBook = snapshot.data!.docs.map((book) {
                 return Book.fromDocument(book);
@@ -267,6 +304,7 @@ class MainScreenPage extends StatelessWidget {
                   flex: 1,
                   child: (readingListListBook.length > 0)
                       ? ListView.builder(
+                          physics: BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
                           itemCount: readingListListBook.length,
                           itemBuilder: (context, index) {
@@ -274,7 +312,7 @@ class MainScreenPage extends StatelessWidget {
                             return InkWell(
                               child: ReadingListCard(
                                 buttonText: '未読',
-                                rating: (book.rating) != null ? book.rating : 0,
+                                rating: book.rating!,
                                 image: book.photoUrl!,
                                 title: book.title,
                                 author: book.author!,
